@@ -300,13 +300,14 @@ section {
   gap: 40px;
 }
 .project-card {
-  background: rgba(22, 27, 34, 0.85);
+  background: #0d1117;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
   backdrop-filter: blur(12px);
   transition: var(--transition);
   position: relative;
+  z-index: 10;
 }
 .project-card:hover {
   border-color: var(--accent);
