@@ -208,6 +208,7 @@
     }
     .chat-bubble {
       max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: .9rem; line-height: 1.5;
+      white-space: pre-wrap;
     }
     .chat-bubble.bot {
       background: var(--card); border: 1px solid var(--border);
@@ -217,6 +218,18 @@
     .chat-bubble.user {
       background: var(--accent); color: #fff; align-self: flex-end;
       border-bottom-right-radius: 4px;
+    }
+    .chat-options {
+      display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
+    }
+    .chat-option-btn {
+      background: var(--surface); border: 1px solid var(--border);
+      color: var(--text); padding: 8px 12px; border-radius: 8px;
+      font-size: .8rem; cursor: pointer; text-align: left;
+      transition: var(--transition); font-weight: 600;
+    }
+    .chat-option-btn:hover {
+      border-color: var(--accent); background: var(--accent-glow);
     }
     .chat-input-area {
       padding: 16px; border-top: 1.5px solid var(--border);
@@ -519,7 +532,7 @@
 
   <!-- ─── Scripts ─── -->
   <script>
-    // Chat Widget Logic
+    // Chat Widget Logic — SIMY Knowledge Base
     (() => {
       const chatBtn = document.getElementById('chatBtn');
       const chatBox = document.getElementById('chatBox');
@@ -539,6 +552,30 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       };
 
+      const kb = [
+        { q: ['hi','hello','hey','halo','hai'], a: "Hi there! 👋 I'm SIMY, Vian's AI assistant. Ask me about his projects, skills, education, or anything else!" },
+        { q: ['project','proyek','work'], a: "Vian has 3 key projects:\n\n1. 📱 衣速達 (Yisuda) — Multi-vendor laundry marketplace built with Flutter, Firebase, GetX, and OTP auth.\n2. 🤖 SIMY — AI LINE bot assistant using Python, Flask, and Gemini API with calendar integration.\n3. 📈 TCA Data Viz — Won 1st place in TCA AI competition, analyzing nurse turnover for hospital HR." },
+        { q: ['skill','tech','stack','flutter','dart'], a: "Vian's tech stack:\n\n📱 Mobile: Flutter, Dart, GetX, State Management\n🔧 Backend: Firebase, Flask, REST APIs\n🤖 AI: Gemini API, Webhook integration, Tool calling\n💻 Languages: Dart, Python, C++\n🛠️ Tools: Git, Postman, Figma, Linux" },
+        { q: ['education','school','university','kuliah'], a: "🎓 B.Sc. Computer Science & Information Engineering at National Dong Hwa University (NDHU), Taiwan. Expected graduation: June 2026.\n\nRelevant coursework: Data Structures, Algorithms, OS, Software Engineering, Mobile App Dev, Machine Learning, Deep Learning, Generative AI." },
+        { q: ['award','prize','competition','juara'], a: "🏆 Vian won **1st place** at the Talent Circulation Alliance (TCA) AI competition in Taiwan! He built a data visualization tool analyzing nurse turnover patterns to support hospital HR decision-making." },
+        { q: ['simy'], a: "🤖 That's me! SIMY is an AI assistant originally built for LINE. The backend is powered by Python, Flask, and Google Gemini API. It supports text, image analysis, and even calendar event creation via tool calling." },
+        { q: ['yisuda','laundry','marketplace'], a: "📱 衣速達 (Yisuda) is a multi-vendor laundry marketplace app connecting customers with local laundry vendors. Built with Flutter + GetX for state management. Features: real-time order tracking, dual-role system (vendor/customer), OTP verification, and concurrent user sessions via Firebase." },
+        { q: ['experience','pengalaman','work'], a: "Vian is a recent CSIE graduate (NDHU, Taiwan) focused on Flutter mobile development. He has hands-on experience building full-stack mobile apps with AI integration, real-time databases, and cross-platform deployment." },
+        { q: ['language','bahasa'], a: "Vian speaks:\n🇮🇩 Indonesian (native)\n🇺🇸 English (professional)\n🇹🇼 Mandarin (conversational)" },
+        { q: ['location','lokasi','taiwan'], a: "📍 Vian is based in Taipei, Taiwan 🇹🇼 — and is open to remote or relocation for Flutter Developer roles!" },
+        { q: ['contact','email','reach'], a: "📧 viansuryajaya37@gmail.com\n🐙 github.com/viansuryajayaa\n💼 linkedin.com/in/viansuryajaya" },
+      ];
+
+      const fallback = "I'm not sure about that! Try asking about Vian's projects, skills, education, awards, or contact info. 😊";
+
+      const getReply = (input) => {
+        const lower = input.toLowerCase().trim();
+        for (const entry of kb) {
+          if (entry.q.some(keyword => lower.includes(keyword))) return entry.a;
+        }
+        return fallback;
+      };
+
       const handleSend = async () => {
         const query = chatInput.value.trim();
         if (!query) return;
@@ -546,47 +583,16 @@
         addMessage(query, 'user');
         chatInput.value = '';
 
-        // Add a temporary typing bubble
         const typingBubble = document.createElement('div');
         typingBubble.classList.add('chat-bubble', 'bot');
-        typingBubble.textContent = '...';
+        typingBubble.textContent = 'Typing...';
         chatMessages.appendChild(typingBubble);
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
-        try {
-          // Call the backend Render endpoint
-          const response = await fetch('https://bot-line-ai.onrender.com/webhook', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              events: [{
-                type: 'message',
-                message: { type: 'text', text: query },
-                replyToken: 'web-demo-token',
-                source: { type: 'user', userId: 'web-demo-user' }
-              }]
-            })
-          });
-
+        setTimeout(() => {
           chatMessages.removeChild(typingBubble);
-
-          if (response.ok) {
-            // Note: Since this is normally a LINE webhook, it might return 200 without a direct body response 
-            // if it relies on pushing to LINE API. 
-            // Ponytail: fallback to client-side Gemini mock responses if the webhook doesn't return direct JSON answers.
-            const data = await response.json().catch(() => null);
-            if (data && data.reply) {
-              addMessage(data.reply, 'bot');
-            } else {
-              addMessage("I've received your query! Since my LINE hook is running asynchronously, please check the console or contact Vian directly to chat via the real LINE bot.", 'bot');
-            }
-          } else {
-            addMessage("Unable to reach backend. Let's try chatting again later!", 'bot');
-          }
-        } catch (err) {
-          chatMessages.removeChild(typingBubble);
-          addMessage("Could not connect to the backend server. The Render service might be sleeping.", 'bot');
-        }
+          addMessage(getReply(query), 'bot');
+        }, 600 + Math.random() * 800);
       };
 
       chatSend.addEventListener('click', handleSend);
