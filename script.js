@@ -186,6 +186,106 @@ setTimeout(() => {
     { label: '📅 Schedule an interview', action: 'schedule' },
   ]), 1500);
 
+  // ─── Local Knowledge Base NLP Parser ───
+  const getBotResponse = (input) => {
+    const clean = input.toLowerCase();
+    
+    // Help / Greetings
+    if (/\b(hi|hello|hey|help|halo|siapa|who)\b/.test(clean)) {
+      return {
+        text: "Hi! I am SIMY, Vian's AI Assistant. You can ask me about his projects, education, skills, or even schedule a call!",
+        options: [
+          { label: '🚀 Show projects', action: 'projects' },
+          { label: '🛠️ List tech stack', action: 'skills' },
+          { label: '💼 Why hire Vian?', action: 'whyHire' }
+        ]
+      };
+    }
+    
+    // Education / Graduate / CSIE / Taiwan
+    if (/\b(taiwan|graduate|study|university|ndhu|csie|kuliah|sekolah|lulus|pendidikan|education)\b/.test(clean)) {
+      return {
+        text: "Vian graduated in June 2026 with a Bachelor's degree in CSIE (Computer Science & Information Engineering) from National Dong Hwa University (NDHU), Taiwan. He has a solid foundation in computer science and mobile app architecture.",
+        options: [
+          { label: '🛠️ View Tech Stack', action: 'skills' },
+          { label: '💼 Why hire Vian?', action: 'whyHire' }
+        ]
+      };
+    }
+    
+    // Flutter / Dart / Mobile
+    if (/\b(flutter|dart|mobile|ios|android|app|application|programming|coding)\b/.test(clean)) {
+      return {
+        text: "Vian specializes in Flutter & Dart for building smooth, cross-platform mobile apps. He is experienced with state management patterns like GetX and BLoC, and designs responsive UIs that feel natural on both iOS and Android.",
+        options: [
+          { label: '👕 Show Yisuda Project', action: 'projects' },
+          { label: '🛠️ View Tech Stack', action: 'skills' }
+        ]
+      };
+    }
+    
+    // Yisuda / Laundry
+    if (/\b(yisuda|laundry|marketplace|laundromat|baju|cuci)\b/.test(clean)) {
+      return {
+        text: "衣速達 (Yisuda) is a premium multi-vendor laundry marketplace built by Vian using Flutter, Firebase, and GetX. It features dual-panel operations (clients/vendors), live order tracking, and phone OTP verification.",
+        options: [
+          { label: '🚀 Explore code', action: 'openLink', value: 'https://github.com/viansuryajayaa' }
+        ]
+      };
+    }
+    
+    // SIMY / Bot / LINE
+    if (/\b(simy|assistant|bot|line|calendar|jadwal)\b/.test(clean)) {
+      return {
+        text: "SIMY is an intelligent assistant integrating the Google Gemini API with Google Calendar. It uses function calling to schedule meetings directly through natural language in a LINE API chatbot chat.",
+        options: [
+          { label: '🚀 SIMY Source Code', action: 'openLink', value: 'https://github.com/viansuryajayaa' }
+        ]
+      };
+    }
+    
+    // Language / Mandarin / Chinese / English / Bahasa
+    if (/\b(mandarin|chinese|language|bahasa|inggris|english|bisa|bicara|speak|talk)\b/.test(clean)) {
+      return {
+        text: "Vian is bilingual. He communicates fluently in English (professional work environment) and Bahasa Indonesia. He is also conversational in Mandarin Chinese due to studying in Taiwan.",
+        options: [
+          { label: '📅 Schedule interview', action: 'schedule' }
+        ]
+      };
+    }
+    
+    // TCA / competition / award
+    if (/\b(tca|competition|winner|prize|lomba|juara|award|nurse|hospital)\b/.test(clean)) {
+      return {
+        text: "Vian won 1st Place in the TCA AI Competition for building a data visualization dashboard analyzing nurse turnover rates. This project highlights his strong capability in parsing complex datasets and UI/UX storytelling.",
+        options: [
+          { label: '💼 Why hire Vian?', action: 'whyHire' }
+        ]
+      };
+    }
+    
+    // Contact / Interview / Hire / Schedule
+    if (/\b(hire|email|contact|interview|job|work|call|schedule|meeting|hubungi|kerja|kontak|telpon)\b/.test(clean)) {
+      return {
+        text: "Vian is actively looking for Flutter Developer positions! Would you like to schedule a 15-minute quick chat or view his contact info?",
+        options: [
+          { label: '📅 Schedule interview', action: 'schedule' },
+          { label: '📧 Contact directly', action: 'openLink', value: 'mailto:viansuryajaya37@gmail.com' }
+        ]
+      };
+    }
+
+    // Default response
+    return {
+      text: `I understood: "${input}". To give you the best answer regarding Vian's portfolio, you can ask about his projects, skills, education, or choose from these options:`,
+      options: [
+        { label: '🚀 Show projects', action: 'projects' },
+        { label: '📅 Schedule interview', action: 'schedule' },
+        { label: '💼 Why hire Vian?', action: 'whyHire' }
+      ]
+    };
+  };
+
   const handleSend = async () => {
     const query = chatInput.value.trim();
     if (!query) return;
@@ -201,13 +301,12 @@ setTimeout(() => {
 
     setTimeout(() => {
       chatMessages.removeChild(typingBubble);
-      addMessage(`I'd love to help with that! For more specific answers, try one of the options below.`, 'bot');
-      addOptions([
-        { label: '🚀 Show projects', action: 'projects' },
-        { label: '📅 Schedule interview', action: 'schedule' },
-        { label: '💼 Why hire Vian?', action: 'whyHire' },
-      ]);
-    }, 800);
+      const response = getBotResponse(query);
+      addMessage(response.text, 'bot');
+      if (response.options) {
+        addOptions(response.options);
+      }
+    }, 600);
   };
 
   chatSend.addEventListener('click', handleSend);
