@@ -24,35 +24,49 @@ document.addEventListener('touchmove', (e) => {
 }, { passive: true });
 
 // ─── GSAP Scroll & Motion Animations ───
-gsap.registerPlugin(ScrollTrigger);
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
 
-// Hero Entry Animation
-gsap.from('.animate-hero', {
-  y: 60,
-  opacity: 0,
-  duration: 1.2,
-  stagger: 0.2,
-  ease: 'power4.out'
-});
+  // Hero Entry Animation
+  gsap.from('.animate-hero', {
+    y: 60,
+    opacity: 0,
+    duration: 1.2,
+    stagger: 0.2,
+    ease: 'power4.out',
+    clearProps: 'opacity,transform'
+  });
 
-// Scroll Fade Trigger
-gsap.utils.toArray('section').forEach((sec) => {
-  const elements = sec.querySelectorAll('.section-tag, .section-title, .about-text, .stat-card, .skill-card, .project-card');
-  if (elements.length > 0) {
-    gsap.from(elements, {
-      scrollTrigger: {
-        trigger: sec,
-        start: 'top 80%',
-        toggleActions: 'play none none none'
-      },
-      y: 40,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.15,
-      ease: 'power3.out'
-    });
-  }
-});
+  // Scroll Fade Trigger
+  gsap.utils.toArray('section').forEach((sec) => {
+    const elements = sec.querySelectorAll('.section-tag, .section-title, .about-text, .stat-card, .skill-card, .project-card');
+    if (elements.length > 0) {
+      gsap.from(elements, {
+        scrollTrigger: {
+          trigger: sec,
+          start: 'top 85%',
+          once: true
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out',
+        clearProps: 'opacity,transform'
+      });
+    }
+  });
+
+  window.addEventListener('load', () => ScrollTrigger.refresh());
+}
+
+// Safety fallback: never leave any content stuck invisible
+setTimeout(() => {
+  document.querySelectorAll('.section-tag, .section-title, .about-text, .stat-card, .skill-card, .project-card, .animate-hero').forEach(el => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+}, 3000);
 
 // ─── Chat Widget Logic (Functional SIMY Menu) ───
 (() => {
