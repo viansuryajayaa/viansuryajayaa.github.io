@@ -44,7 +44,7 @@
       scroll-behavior: smooth;
     }
 
-    /* ─── 3D Canvas Background ─── */
+    /* ─── Animated Mesh Gradient Background ─── */
     #webgl-canvas {
       position: fixed !important;
       top: 0 !important;
@@ -52,8 +52,14 @@
       width: 100vw !important;
       height: 100vh !important;
       z-index: -1 !important;
-      display: block !important;
-      background: #030308;
+      background: radial-gradient(circle at 50% 50%, #1e1b4b 0%, #030308 80%);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
 
     /* ─── Custom Fluid Cursor ─── */
