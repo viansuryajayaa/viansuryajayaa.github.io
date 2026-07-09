@@ -6,426 +6,645 @@
   <title>VIAN SURYAJAYA | Flutter Mobile Developer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  
+  <!-- CDNs for Creative Effects (Three.js & GSAP) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
   <style>
-    /* ── Premium Glassmorphism Theme ── */
+    /* ─── Base & Theme Variables ─── */
     :root {
-      --bg: #030303;
-      --bg-light: #f8fafc;
-      --surface: #0a0a16;
-      --surface-light: #ffffff;
-      --card: rgba(16, 16, 32, 0.65);
-      --card-light: rgba(255, 255, 255, 0.85);
-      --card-hover: rgba(24, 24, 48, 0.85);
-      --card-hover-light: rgba(255, 255, 255, 0.95);
-      --border: rgba(124, 92, 252, 0.15);
-      --border-light: rgba(124, 92, 252, 0.1);
-      --text: #f1f5f9;
-      --text-light: #0f172a;
+      --bg: #030308;
+      --surface: #070714;
+      --card: rgba(10, 10, 25, 0.45);
+      --border: rgba(139, 92, 246, 0.15);
+      --text: #f8fafc;
       --text-dim: #94a3b8;
-      --text-dim-light: #475569;
-      --accent: #8b5cf6;
-      --accent-rgb: 139, 92, 246;
-      --accent-glow: rgba(139, 92, 246, 0.15);
-      --green: #10b981;
-      --green-glow: rgba(16, 185, 129, 0.1);
-      --radius: 20px;
-      --transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      --accent: #a78bfa;
+      --accent-rgb: 167, 139, 250;
+      --green: #34d399;
+      --radius: 16px;
+      --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    [data-theme="light"] {
-      --bg: var(--bg-light);
-      --surface: var(--surface-light);
-      --card: var(--card-light);
-      --card-hover: var(--card-hover-light);
-      --border: var(--border-light);
-      --text: var(--text-light);
-      --text-dim: var(--text-dim-light);
-      --accent-glow: rgba(139, 92, 246, 0.06);
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+
+    html, body {
       background: var(--bg);
       color: var(--text);
-      line-height: 1.7;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       overflow-x: hidden;
-      transition: background var(--transition), color var(--transition);
-    }
-    ::selection { background: var(--accent); color: white; }
-
-    /* Modern Mesh Gradients */
-    .glow-container {
-      position: absolute; width: 100%; height: 100%; top: 0; left: 0;
-      pointer-events: none; z-index: -2; overflow: hidden;
-    }
-    .glow-ball-1 {
-      position: absolute; top: 10%; right: -10%; width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
-      filter: blur(80px);
-    }
-    .glow-ball-2 {
-      position: absolute; bottom: 10%; left: -10%; width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
-      filter: blur(80px);
+      scroll-behavior: smooth;
     }
 
-    /* ── Nav ── */
+    /* ─── 3D Canvas Background ─── */
+    #webgl-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ─── Custom Fluid Cursor ─── */
+    .custom-cursor {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+    }
+    .custom-cursor-follower {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(167, 139, 250, 0.3);
+      border-radius: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.08s ease-out;
+    }
+
+    /* Hover States for Interactive Elements */
+    .interactive-hover:hover ~ .custom-cursor {
+      width: 24px;
+      height: 24px;
+      background: rgba(167, 139, 250, 0.2);
+    }
+
+    /* ─── Navigation ─── */
     nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      padding: 20px 24px; backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      background: rgba(3, 3, 3, 0.6); border-bottom: 1px solid var(--border);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 24px 40px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(3, 3, 8, 0.5);
+      border-bottom: 1px solid var(--border);
+    }
+    nav .inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    nav .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, var(--accent), var(--green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    nav ul {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    nav a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
       transition: var(--transition);
     }
-    nav[data-theme="light"] { background: rgba(248, 250, 252, 0.7); }
-    nav .inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
-    nav .logo { font-weight: 800; font-size: 1.35rem; background: linear-gradient(135deg, var(--accent), var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-family: 'JetBrains Mono', monospace; }
-    nav ul { display: flex; gap: 32px; list-style: none; align-items: center; }
-    nav a { color: var(--text-dim); text-decoration: none; font-size: .9rem; font-weight: 600; transition: var(--transition); position: relative; }
-    nav a:hover { color: var(--text); }
-    nav a::after { content: ''; position: absolute; bottom: -6px; left: 0; right: 0; height: 2px; background: var(--accent); border-radius: 2px; transform: scaleX(0); transition: var(--transition); }
-    nav a:hover::after { transform: scaleX(1); }
-    .theme-toggle { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 8px 16px; cursor: pointer; font-size: .9rem; transition: var(--transition); }
-    .theme-toggle:hover { background: var(--accent-glow); transform: scale(1.05); }
-    .nav-cta { background: var(--accent); color: #fff !important; padding: 10px 22px; border-radius: 12px; font-weight: 700; box-shadow: 0 4px 14px rgba(139, 92, 246, 0.3); }
-    .nav-cta:hover { background: #7c3aed; box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); transform: translateY(-1px); }
-    .nav-cta::after { display: none; }
-
-    /* ── Sections ── */
-    section { max-width: 1100px; margin: 0 auto; padding: 120px 24px; position: relative; }
-    @media (max-width: 768px) { section { padding: 90px 24px; } }
-    .section-tag { display: inline-block; font-size: .8rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
-    .section-title { font-size: 2.75rem; font-weight: 800; margin-bottom: 56px; letter-spacing: -0.03em; line-height: 1.2; }
-    @media (max-width: 768px) { .section-title { font-size: 2rem; } }
-
-    /* ── Hero ── */
-    #hero { min-height: 100vh; display: flex; align-items: center; padding-top: 100px; }
-    #hero .content { max-width: 800px; }
-    #hero .greeting { display: inline-flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 100px; padding: 8px 20px; font-size: .85rem; color: var(--text-dim); margin-bottom: 32px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
-    #hero .greeting .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; animation: pulse-dot 2s infinite; }
-    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(1.2)} }
-    #hero h1 { font-size: clamp(2.75rem, 7vw, 5rem); font-weight: 800; line-height: 1.1; letter-spacing: -.03em; margin-bottom: 28px; }
-    #hero h1 .highlight { background: linear-gradient(135deg, var(--accent), #c084fc, var(--green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    #hero p { font-size: 1.25rem; color: var(--text-dim); max-width: 640px; margin-bottom: 44px; font-weight: 500; }
-    #hero .buttons { display: flex; gap: 16px; flex-wrap: wrap; }
-    .btn { display: inline-flex; align-items: center; gap: 10px; padding: 14px 32px; border-radius: 14px; font-weight: 700; font-size: .95rem; text-decoration: none; transition: var(--transition); cursor: pointer; }
-    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 20px rgba(139, 92, 246, 0.25); }
-    .btn-primary:hover { background: #7c3aed; transform: translateY(-3px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35); }
-    .btn-outline { border: 1.5px solid var(--border); color: var(--text); background: rgba(3, 3, 3, 0.2); }
-    .btn-outline:hover { border-color: var(--accent); background: var(--accent-glow); transform: translateY(-3px); }
-
-    /* ── About ── */
-    .about-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 64px; }
-    @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; gap: 48px; } }
-    .about-text p { color: var(--text-dim); margin-bottom: 24px; font-size: 1.05rem; }
-    .about-text .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 40px; }
-    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px 16px; text-align: center; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: var(--transition); }
-    .stat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .stat-card .num { font-size: 2rem; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-    .stat-card .label { font-size: .8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-
-    .about-timeline { position: relative; padding-left: 28px; }
-    .about-timeline::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 2px; background: linear-gradient(to bottom, var(--accent), var(--green), transparent); }
-    .tl-item { position: relative; margin-bottom: 36px; }
-    .tl-item::before { content: ''; position: absolute; left: -33px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); transition: var(--transition); }
-    .tl-item:hover::before { background: var(--green); border-color: var(--green); scale: 1.2; }
-    .tl-item .date { font-size: .8rem; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
-    .tl-item h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .tl-item p { font-size: .9rem; color: var(--text-dim); }
-
-    /* ── Skills ── */
-    .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
-    .skill-cat { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; transition: var(--transition); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .skill-cat:hover { border-color: var(--accent); background: var(--card-hover); transform: translateY(-4px); }
-    .skill-cat h3 { font-size: .9rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 24px; }
-    .skill-cat .tags { display: flex; flex-wrap: wrap; gap: 10px; }
-    .skill-cat .tags span { background: var(--accent-glow); color: var(--text); padding: 6px 14px; border-radius: 8px; font-size: .85rem; font-weight: 600; border: 1px solid rgba(139,92,246,.15); transition: var(--transition); }
-    .skill-cat .tags span:hover { background: var(--accent); color: white; transform: scale(1.05); }
-
-    /* ── Projects ── */
-    .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px; }
-    .project-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: var(--transition); display: flex; flex-direction: column; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .project-card:hover { border-color: var(--accent); transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-    .project-card .thumb { aspect-ratio: 16/10; background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(16, 185, 129, 0.2)); display: flex; align-items: center; justify-content: center; font-size: 3rem; position: relative; overflow: hidden; transition: var(--transition); }
-    .project-card:hover .thumb { background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(16, 185, 129, 0.35)); }
-    .project-card .body { padding: 32px; flex: 1; display: flex; flex-direction: column; }
-    .project-card .body h3 { font-size: 1.35rem; margin-bottom: 12px; font-weight: 700; }
-    .project-card .body p { font-size: .95rem; color: var(--text-dim); margin-bottom: 24px; flex: 1; }
-    .project-card .stack { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-    .project-card .stack span { background: var(--surface); border: 1px solid var(--border); padding: 4px 12px; border-radius: 6px; font-size: .75rem; color: var(--text-dim); font-weight: 600; }
-    .project-card .links { display: flex; gap: 16px; align-items: center; }
-    .project-card .links a { color: var(--text); text-decoration: none; font-size: .9rem; font-weight: 700; transition: var(--transition); display: inline-flex; align-items: center; gap: 6px; }
-    .project-card .links a:hover { color: var(--accent); }
-
-    /* ── Achievements & Honors ── */
-    .achievements { margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border); }
-    .achievement-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-    .achievement-badge {
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 28px; display: flex; gap: 20px; align-items: center;
-      transition: var(--transition); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    nav a:hover {
+      color: var(--text);
     }
-    .achievement-badge:hover { border-color: var(--accent); transform: translateY(-4px); }
-    .achievement-badge .icon-box { font-size: 2.25rem; }
-    .achievement-badge .info h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 4px; }
-    .achievement-badge .info p { font-size: .85rem; color: var(--text-dim); }
 
-    /* ── Chat Widget ── */
+    /* ─── Main Sections ─── */
+    section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 160px 40px;
+      position: relative;
+    }
+    .section-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 4px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .section-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 64px;
+      line-height: 1.1;
+    }
+
+    /* ─── Hero Section ─── */
+    .hero {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 100px;
+    }
+    .hero h1 {
+      font-size: 6rem;
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 0.95;
+      margin-bottom: 24px;
+    }
+    .hero h1 span {
+      display: block;
+      background: linear-gradient(135deg, #fff 30%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.5rem;
+      color: var(--text-dim);
+      max-width: 600px;
+      line-height: 1.5;
+      margin-bottom: 40px;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 16px 32px;
+      border-radius: 40px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+      width: fit-content;
+    }
+    .hero-cta:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #030308;
+      box-shadow: 0 0 30px rgba(167, 139, 250, 0.4);
+    }
+
+    /* ─── About Section ─── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-text {
+      font-size: 1.2rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+    }
+    .stat-card h3 {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    /* ─── Skills Section ─── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 32px;
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+    .skill-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-8px);
+    }
+    .skill-card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .skill-card ul {
+      list-style: none;
+      color: var(--text-dim);
+    }
+    .skill-card li {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    /* ─── Projects Section ─── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+    }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+      position: relative;
+    }
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-12px) scale(1.02);
+    }
+    .project-card .thumb {
+      height: 240px;
+      background: linear-gradient(135deg, rgba(167, 139, 250, 0.1), rgba(52, 211, 153, 0.05));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .project-card .body {
+      padding: 40px;
+    }
+    .project-card h3 {
+      font-size: 1.75rem;
+      margin-bottom: 12px;
+    }
+    .project-card p {
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .project-card .stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .project-card .stack span {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .project-card .links a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* ─── Contact Section ─── */
+    .contact-content {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .contact-content p {
+      font-size: 1.25rem;
+      color: var(--text-dim);
+      margin-bottom: 48px;
+    }
+    .contact-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+    .contact-links a {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 16px 32px;
+      border-radius: 30px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .contact-links a:hover {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #030308;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+
+    /* ─── Chat Widget ─── */
     .chat-widget {
-      position: fixed; bottom: 32px; right: 32px; z-index: 1000;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      position: fixed;
+      bottom: 32px;
+      right: 32px;
+      z-index: 1000;
     }
     .chat-btn {
-      width: 60px; height: 60px; border-radius: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 30px;
       background: linear-gradient(135deg, var(--accent), var(--green));
-      box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer; transition: var(--transition); border: none;
-      font-size: 1.6rem; color: #fff;
+      box-shadow: 0 8px 24px rgba(167, 139, 250, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      font-size: 1.6rem;
+      color: #fff;
     }
-    .chat-btn:hover { transform: scale(1.08) rotate(5deg); }
     .chat-box {
-      position: absolute; bottom: 80px; right: 0;
-      width: 380px; height: 500px;
-      background: var(--surface); border: 1.5px solid var(--border);
-      border-radius: 20px; box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-      display: flex; flex-direction: column; overflow: hidden;
-      transform: translateY(20px) scale(0.95); opacity: 0; pointer-events: none;
-      transition: var(--transition); backdrop-filter: blur(20px);
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 380px;
+      height: 500px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+      backdrop-filter: blur(20px);
     }
     .chat-box.open {
-      transform: translateY(0) scale(1); opacity: 1; pointer-events: all;
+      transform: translateY(0) scale(1);
+      opacity: 1;
+      pointer-events: all;
     }
     .chat-header {
-      padding: 20px; background: rgba(139, 92, 246, 0.1);
-      border-bottom: 1.5px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px;
+      background: rgba(167, 139, 250, 0.1);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
-    .chat-header .title { font-weight: 700; font-size: 1rem; color: var(--text); display: flex; align-items: center; gap: 8px; }
-    .chat-header .status { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
-    .chat-header .close { cursor: pointer; color: var(--text-dim); border: none; background: none; font-size: 1.2rem; }
+    .chat-header .title {
+      font-weight: 700;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-header .status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .chat-header .close {
+      cursor: pointer;
+      color: var(--text-dim);
+      border: none;
+      background: none;
+      font-size: 1.2rem;
+    }
     .chat-messages {
-      flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
     .chat-bubble {
-      max-width: 80%; padding: 12px 16px; border-radius: 14px; font-size: .9rem; line-height: 1.5;
+      max-width: 80%;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 0.9rem;
+      line-height: 1.5;
       white-space: pre-wrap;
     }
     .chat-bubble.bot {
-      background: var(--card); border: 1px solid var(--border);
-      color: var(--text); align-self: flex-start;
+      background: var(--card);
+      border: 1px solid var(--border);
+      align-self: flex-start;
       border-bottom-left-radius: 4px;
     }
     .chat-bubble.user {
-      background: var(--accent); color: #fff; align-self: flex-end;
+      background: var(--accent);
+      color: #030308;
+      align-self: flex-end;
       border-bottom-right-radius: 4px;
+      font-weight: 600;
     }
     .chat-options {
-      display: flex; flex-direction: column; gap: 8px; margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
     }
     .chat-option-btn {
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--text); padding: 8px 12px; border-radius: 8px;
-      font-size: .8rem; cursor: pointer; text-align: left;
-      transition: var(--transition); font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      text-align: left;
+      transition: var(--transition);
+      font-weight: 600;
     }
     .chat-option-btn:hover {
-      border-color: var(--accent); background: var(--accent-glow);
+      border-color: var(--accent);
+      background: rgba(167, 139, 250, 0.1);
     }
     .chat-input-area {
-      padding: 16px; border-top: 1.5px solid var(--border);
-      display: flex; gap: 10px; background: rgba(3, 3, 3, 0.2);
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
     }
     .chat-input {
-      flex: 1; background: var(--card); border: 1px solid var(--border);
-      border-radius: 12px; padding: 12px 16px; color: var(--text);
-      font-size: .9rem; outline: none; transition: var(--transition);
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      color: var(--text);
+      font-size: 0.9rem;
+      outline: none;
     }
-    .chat-input:focus { border-color: var(--accent); }
     .chat-send {
-      background: var(--accent); border: none; border-radius: 12px;
-      padding: 12px 18px; color: #fff; font-weight: 700; cursor: pointer;
-      transition: var(--transition);
+      background: var(--accent);
+      border: none;
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #030308;
+      font-weight: 700;
+      cursor: pointer;
     }
-    .chat-send:hover { background: #7c3aed; }
-    @media (max-width: 480px) {
-      .chat-box { width: calc(100vw - 32px); height: 450px; bottom: 70px; right: -16px; }
+
+    @media (max-width: 768px) {
+      .about-grid, .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+      .hero h1 {
+        font-size: 3.5rem;
+      }
+      nav ul {
+        display: none;
+      }
+      .custom-cursor, .custom-cursor-follower {
+        display: none;
+      }
     }
-
-    /* ── Contact ── */
-    #contact { text-align: center; }
-    #contact p { color: var(--text-dim); max-width: 520px; margin: 0 auto 48px; font-size: 1.1rem; }
-    .contact-channels { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-    .contact-channels a { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 32px; text-decoration: none; color: var(--text); font-weight: 700; display: inline-flex; align-items: center; gap: 10px; transition: var(--transition); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
-    .contact-channels a:hover { border-color: var(--accent); background: var(--accent-glow); transform: translateY(-4px); box-shadow: 0 10px 24px rgba(139, 92, 246, 0.15); }
-    .contact-channels a .icon { font-size: 1.4rem; }
-    .download-btn { background: linear-gradient(135deg, var(--accent), var(--green)); color: #fff !important; }
-    .download-btn:hover { box-shadow: 0 10px 24px rgba(139, 92, 246, 0.25) !important; }
-
-    /* ── Footer ── */
-    footer { text-align: center; padding: 56px 24px; border-top: 1px solid var(--border); color: var(--text-dim); font-size: .9rem; font-weight: 500; }
-
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
-
-    /* ── Smooth Fade up ── */
-    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
-    .fade-in.visible { opacity: 1; transform: translateY(0); }
-    .stagger-items > * { opacity: 0; transform: translateY(20px); transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
-    .stagger-items.visible > * { opacity: 1; transform: translateY(0); }
-    .stagger-items.visible > *:nth-child(1) { transition-delay: 0.1s; }
-    .stagger-items.visible > *:nth-child(2) { transition-delay: 0.2s; }
-    .stagger-items.visible > *:nth-child(3) { transition-delay: 0.3s; }
-    .stagger-items.visible > *:nth-child(4) { transition-delay: 0.4s; }
   </style>
 </head>
 <body>
 
-  <div class="glow-container">
-    <div class="glow-ball-1"></div>
-    <div class="glow-ball-2"></div>
-  </div>
+  <!-- Custom Cursor Elements -->
+  <div class="custom-cursor" id="cursor"></div>
+  <div class="custom-cursor-follower" id="cursor-follower"></div>
 
-  <!-- ─── Nav ─── -->
+  <!-- WebGL Canvas for 3D Background -->
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Navigation -->
   <nav>
     <div class="inner">
-      <span class="logo">~/vian.dev</span>
+      <div class="logo">VIAN.DEV</div>
       <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#contact">Contact</a></li>
+        <li><a href="#about" class="interactive-hover">About</a></li>
+        <li><a href="#skills" class="interactive-hover">Skills</a></li>
+        <li><a href="#projects" class="interactive-hover">Projects</a></li>
+        <li><a href="#contact" class="interactive-hover">Contact</a></li>
       </ul>
-      <span class="theme-toggle" id="themeToggle">🌙</span>
     </div>
   </nav>
 
-  <!-- ─── Hero ─── -->
-  <section id="hero">
-    <div class="content">
-      <div class="greeting">
-        <span class="dot"></span> Open to work · Flutter Developer
-      </div>
-      <h1>
-        Building <span class="highlight">mobile apps</span><br />
-        with clean code
-      </h1>
-      <p>
-        Hi, I'm VIAN SURYAJAYA — a Flutter developer based in Taipei, Taiwan.
-        I specialize in turning complex designs and AI-powered logic into smooth, 
-        native mobile experiences.
-      </p>
-      <div class="buttons">
-        <a href="#projects" class="btn btn-primary">Featured Work →</a>
-        <a href="#contact" class="btn btn-outline">Let's Connect</a>
-      </div>
-    </div>
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <span class="section-tag animate-hero">Flutter Developer</span>
+    <h1 class="animate-hero">
+      <span>VIAN</span>
+      <span>SURYAJAYA</span>
+    </h1>
+    <p class="animate-hero">B.Sc. Computer Science & Information Engineering graduate specializing in building premium cross-platform mobile experiences.</p>
+    <a href="#contact" class="hero-cta interactive-hover animate-hero">Let's Connect →</a>
   </section>
 
-  <!-- ─── About ─── -->
+  <!-- About Section -->
   <section id="about">
-    <span class="section-tag">About Me</span>
-    <h2 class="section-title">CSIE Graduate & Mobile Engineer</h2>
+    <span class="section-tag">Overview</span>
+    <h2 class="section-title">Designing Digital Horizons</h2>
     <div class="about-grid">
       <div class="about-text">
-        <p>
-          I'm a graduate from <strong>National Dong Hwa University (CSIE)</strong>
-          in Taiwan with a solid foundation in computer science and software engineering (expected June 2026).
-          My focus is entirely on <strong>Flutter & Dart</strong> — building high-performance 
-          cross-platform applications that don't compromise on user experience.
-        </p>
-        <p>
-          I thrive on integration challenges, whether it's setting up Webhooks,
-          handling real-time messaging on Firebase, or building custom tool-calling engines with Gemini API.
-        </p>
-        <div class="stat-row stagger-items">
-          <div class="stat-card">
-            <div class="num">3+</div>
-            <div class="label">Key Projects</div>
-          </div>
-          <div class="stat-card">
-            <div class="num">1st</div>
-            <div class="label">AI Award</div>
-          </div>
-          <div class="stat-card">
-            <div class="num">NDHU</div>
-            <div class="label">CSIE Dept</div>
-          </div>
-        </div>
+        <p>I build mobile applications that blend aesthetic fluidity with robust performance. With NDHU CSIE education, my goal is to craft systems that don't just work, but feel exceptionally premium and organic to use.</p>
       </div>
-      <div class="about-timeline stagger-items">
-        <div class="tl-item">
-          <div class="date">2024 – 2026</div>
-          <h4>B.Sc. Computer Science &amp; Engineering</h4>
-          <p>National Dong Hwa University, Taiwan</p>
+      <div class="about-stats">
+        <div class="stat-card">
+          <h3>2+</h3>
+          <p>Years Dev Experience</p>
         </div>
-        <div class="tl-item">
-          <div class="date">2025</div>
-          <h4>衣速達 (Yisuda)</h4>
-          <p>Multi-vendor laundry marketplace built using Flutter &amp; GetX.</p>
-        </div>
-        <div class="tl-item">
-          <div class="date">2025</div>
-          <h4>SIMY Personal AI Assistant</h4>
-          <p>LINE Bot integrating webhooks and dynamic Gemini API tools.</p>
+        <div class="stat-card">
+          <h3>1st</h3>
+          <p>TCA AI Prize winner</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ─── Skills ─── -->
+  <!-- Skills Section -->
   <section id="skills">
     <span class="section-tag">Expertise</span>
-    <h2 class="section-title">Core Competencies</h2>
-    <div class="skills-grid stagger-items">
-      <div class="skill-cat">
-        <h3>Mobile Architecture</h3>
-        <div class="tags">
-          <span>Flutter</span><span>Dart</span><span>GetX</span>
-          <span>State Management</span><span>Firebase Suite</span><span>OTP Auth</span>
-        </div>
+    <h2 class="section-title">Technical Arsenal</h2>
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h3>📱 Mobile</h3>
+        <ul>
+          <li>Flutter & Dart</li>
+          <li>GetX / Bloc State Management</li>
+          <li>Core animation design</li>
+          <li>Performance profiling</li>
+        </ul>
       </div>
-      <div class="skill-cat">
-        <h3>Backend &amp; AI Integration</h3>
-        <div class="tags">
-          <span>Python</span><span>Flask</span><span>REST APIs</span>
-          <span>Gemini API</span><span>Webhook Handling</span><span>Tool Calling</span>
-        </div>
+      <div class="skill-card">
+        <h3>🔧 Backend & AI</h3>
+        <ul>
+          <li>Firebase ecosystem</li>
+          <li>Flask webhooks</li>
+          <li>Google Gemini API integrations</li>
+          <li>Database optimizations</li>
+        </ul>
       </div>
-      <div class="skill-cat">
-        <h3>Developer Tools</h3>
-        <div class="tags">
-          <span>Git</span><span>Postman</span><span>Figma</span>
-          <span>Linux Shell</span><span>AI-Assisted Dev</span>
-        </div>
-      </div>
-      <div class="skill-cat">
-        <h3>CS Foundations</h3>
-        <div class="tags">
-          <span>Algorithms</span><span>C++</span><span>SQL</span>
-          <span>Machine Learning</span><span>Deep Learning</span>
-        </div>
+      <div class="skill-card">
+        <h3>🛠️ Infrastructure</h3>
+        <ul>
+          <li>Git & GitHub actions</li>
+          <li>Dockerized environments</li>
+          <li>VPS configuration</li>
+          <li>Coolify / PAAS systems</li>
+        </ul>
       </div>
     </div>
   </section>
 
-  <!-- ─── Projects ─── -->
+  <!-- Projects Section -->
   <section id="projects">
     <span class="section-tag">Case Studies</span>
-    <h2 class="section-title">Featured Applications</h2>
-    <div class="projects-grid stagger-items">
+    <h2 class="section-title">Selected Productions</h2>
+    <div class="projects-grid">
       <div class="project-card">
         <div class="thumb">👕</div>
         <div class="body">
           <h3>衣速達 (Yisuda)</h3>
-          <p>A multi-vendor laundry marketplace mobile application connecting customers with local vendors. Implemented real-time order tracking, dual-role system (vendor/customer), and concurrent user sessions.</p>
+          <p>A multi-vendor laundry marketplace connecting clients with local providers. Features live tracking, dual-role panels, and multi-session persistence.</p>
           <div class="stack">
-            <span>Flutter</span><span>GetX</span><span>Firebase Firestore</span><span>OTP Verification</span>
+            <span>Flutter</span><span>Firebase</span><span>GetX</span><span>OTP Security</span>
           </div>
           <div class="links">
-            <a href="https://github.com/viansuryajayaa" target="_blank">View Code →</a>
+            <a href="https://github.com/viansuryajayaa" target="_blank" class="interactive-hover">Explore Code →</a>
           </div>
         </div>
       </div>
@@ -433,90 +652,46 @@
         <div class="thumb">🤖</div>
         <div class="body">
           <h3>SIMY - AI Assistant</h3>
-          <p>A smart LINE-integrated AI personal assistant using Gemini API for multi-modal text and image processing. Configured calendar event creation dynamically via system tool calls.</p>
+          <p>An intelligent bot integrating Gemini API with Google Calendar via tool calling to automate scheduling directly from conversations.</p>
           <div class="stack">
-            <span>Python</span><span>Flask Webhook</span><span>Gemini API</span><span>LINE API</span>
+            <span>Python</span><span>Flask</span><span>Gemini API</span><span>LINE API</span>
           </div>
           <div class="links">
-            <a href="https://github.com/viansuryajayaa" target="_blank">View Code →</a>
-          </div>
-        </div>
-      </div>
-      <div class="project-card">
-        <div class="thumb">📈</div>
-        <div class="body">
-          <h3>TCA Nurse Turnover Viz</h3>
-          <p>A data visualization tool designed for hospital HR tracking. Analyzes nursing turnover trends to assist decisions. Awarded 1st place in TCA AI Competition in Taiwan.</p>
-          <div class="stack">
-            <span>Python</span><span>Data Analytics</span><span>Data Viz</span><span>AI Modeling</span>
-          </div>
-          <div class="links">
-            <a href="https://github.com/viansuryajayaa" target="_blank">Project Link →</a>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Achievements -->
-    <div class="achievements fade-in">
-      <h3 style="margin-bottom: 32px; text-align: center;">Honors &amp; Awards</h3>
-      <div class="achievement-list stagger-items">
-        <div class="achievement-badge">
-          <div class="icon-box">🏆</div>
-          <div class="info">
-            <h4>AI First Prize Winner</h4>
-            <p>Talent Circulation Alliance (TCA) competition, Taiwan</p>
-          </div>
-        </div>
-        <div class="achievement-badge">
-          <div class="icon-box">🎓</div>
-          <div class="info">
-            <h4>NDHU CSIE Graduate</h4>
-            <p>Solid core in algorithms and data structures</p>
+            <a href="https://github.com/viansuryajayaa" target="_blank" class="interactive-hover">Explore Code →</a>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ─── Contact ─── -->
+  <!-- Contact Section -->
   <section id="contact">
-    <span class="section-tag">Get in Touch</span>
-    <h2 class="section-title">Let's Build Something Beautiful</h2>
-    <p>
-      I'm currently looking for Flutter Developer opportunities. If you'd like to check out my full CV or chat about a project, reach out directly.
-    </p>
-    <div class="contact-channels stagger-items">
-      <a href="mailto:viansuryajaya37@gmail.com">
-        <span class="icon">✉️</span> viansuryajaya37@gmail.com
-      </a>
-      <a href="https://www.linkedin.com/in/viansuryajaya" target="_blank">
-        <span class="icon">💼</span> LinkedIn
-      </a>
-      <a href="https://github.com/viansuryajayaa" target="_blank">
-        <span class="icon">🐙</span> GitHub
-      </a>
-      <a href="https://github.com/viansuryajayaa/viansuryajayaa.github.io/raw/main/index.html" class="download-btn">
-        <span class="icon">📄</span> Get Resume PDF
-      </a>
+    <div class="contact-content">
+      <span class="section-tag">Inquire</span>
+      <h2 class="section-title" style="margin-bottom: 24px;">Start a Conversation</h2>
+      <p>Whether you're looking to hire a Flutter Developer or want to chat about project engineering, my inbox is open.</p>
+      <div class="contact-links">
+        <a href="mailto:viansuryajaya37@gmail.com" class="interactive-hover">Email Vian</a>
+        <a href="https://linkedin.com/in/viansuryajaya" target="_blank" class="interactive-hover">LinkedIn</a>
+      </div>
     </div>
   </section>
 
-  <!-- ─── Footer ─── -->
+  <!-- Footer -->
   <footer>
-    <p>© 2026 VIAN SURYAJAYA · Built with Flutter ❤️ · Taipei, Taiwan</p>
+    <p>© 2026 VIAN SURYAJAYA · Crafted for high-impact production · Taipei, Taiwan</p>
   </footer>
 
-  <!-- ─── Chat Widget ─── -->
+  <!-- Chat Widget (SIMY) -->
   <div class="chat-widget">
-    <button class="chat-btn" id="chatBtn">💬</button>
+    <button class="chat-btn interactive-hover" id="chatBtn">💬</button>
     <div class="chat-box" id="chatBox">
       <div class="chat-header">
         <div class="title">
           <span class="status"></span>
           SIMY AI Assistant
         </div>
-        <button class="close" id="chatClose">✕</button>
+        <button class="close interactive-hover" id="chatClose">✕</button>
       </div>
       <div class="chat-messages" id="chatMessages">
         <div class="chat-bubble bot">
@@ -525,14 +700,118 @@
       </div>
       <div class="chat-input-area">
         <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." />
-        <button class="chat-send" id="chatSend">Send</button>
+        <button class="chat-send interactive-hover" id="chatSend">Send</button>
       </div>
     </div>
   </div>
 
-  <!-- ─── Scripts ─── -->
+  <!-- Javascript for Interactions and 3D Visuals -->
   <script>
-    // Chat Widget Logic — SIMY (Functional AI Assistant)
+    // ─── Custom Cursor ───
+    const cursor = document.getElementById('cursor');
+    const follower = document.getElementById('cursor-follower');
+    
+    document.addEventListener('mousemove', (e) => {
+      gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1 });
+      gsap.to(follower, { x: e.clientX, y: e.clientY, duration: 0.3 });
+    });
+
+    // ─── Three.js 3D Particle Cloud Background ───
+    const canvas = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Particle Geometry
+    const particlesCount = 1500;
+    const posArray = new Float32Array(particlesCount * 3);
+
+    for (let i = 0; i < particlesCount * 3; i++) {
+      posArray[i] = (Math.random() - 0.5) * 10;
+    }
+
+    const particlesGeometry = new THREE.BufferGeometry();
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+    // Custom Particle Texture
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.02,
+      color: 0xa78bfa,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+
+    const particlesMesh = new THREE.Points(particlesGeometry, particleMaterial);
+    scene.add(particlesMesh);
+
+    camera.position.z = 3;
+
+    // Mouse Tracking for 3D Interaction
+    let mouseX = 0;
+    let mouseY = 0;
+    document.addEventListener('mousemove', (e) => {
+      mouseX = (e.clientX / window.innerWidth) - 0.5;
+      mouseY = (e.clientY / window.innerHeight) - 0.5;
+    });
+
+    // Animation Loop
+    const clock = new THREE.Clock();
+    const tick = () => {
+      const elapsedTime = clock.getElapsedTime();
+      
+      // Infinite rotate & drift
+      particlesMesh.rotation.y = elapsedTime * 0.05;
+      particlesMesh.rotation.x = elapsedTime * 0.02;
+
+      // Mouse interactive drift
+      particlesMesh.position.x = mouseX * 0.5;
+      particlesMesh.position.y = -mouseY * 0.5;
+
+      renderer.render(scene, camera);
+      window.requestAnimationFrame(tick);
+    };
+    tick();
+
+    // Window Resize Handler
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─── GSAP Scroll & Motion Animations ───
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero Entry Animation
+    gsap.from('.animate-hero', {
+      y: 60,
+      opacity: 0,
+      duration: 1.2,
+      stagger: 0.2,
+      ease: 'power4.out'
+    });
+
+    // Scroll Fade Trigger
+    gsap.utils.toArray('section').forEach((sec) => {
+      gsap.from(sec.querySelectorAll('.section-tag, .section-title, .about-text, .stat-card, .skill-card, .project-card'), {
+        scrollTrigger: {
+          trigger: sec,
+          start: 'top 80%',
+          toggleActions: 'play none none none'
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'power3.out'
+      });
+    });
+
+    // ─── Chat Widget Logic (Functional SIMY Menu) ───
     (() => {
       const chatBtn = document.getElementById('chatBtn');
       const chatBox = document.getElementById('chatBox');
@@ -557,7 +836,7 @@
         wrapper.classList.add('chat-options');
         options.forEach(opt => {
           const btn = document.createElement('button');
-          btn.classList.add('chat-option-btn');
+          btn.classList.add('chat-option-btn', 'interactive-hover');
           btn.textContent = opt.label;
           btn.onclick = () => {
             wrapper.remove();
@@ -676,40 +955,6 @@
       chatInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') handleSend();
       });
-    })();
-    // Theme Toggle
-    (() => {
-      const toggle = document.getElementById('themeToggle');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
-      if (currentTheme === 'light') document.documentElement.setAttribute('data-theme', 'light');
-      toggle.textContent = currentTheme === 'dark' ? '🌙' : '☀️';
-      toggle.addEventListener('click', () => {
-        const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
-        document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
-        localStorage.setItem('theme', isDark ? 'light' : 'dark');
-        toggle.textContent = isDark ? '🌙' : '☀️';
-      });
-    })();
-
-    // Premium Fade-up & Stagger animations
-    (() => {
-      const singleElements = document.querySelectorAll('.fade-in, .section-title, .section-tag');
-      const staggerGroups = document.querySelectorAll('.stagger-items');
-      
-      const obsOptions = { threshold: 0.08, rootMargin: '0px 0px -50px 0px' };
-      
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            observer.unobserve(e.target);
-          }
-        });
-      }, obsOptions);
-
-      singleElements.forEach(el => observer.observe(el));
-      staggerGroups.forEach(el => observer.observe(el));
     })();
   </script>
 </body>
