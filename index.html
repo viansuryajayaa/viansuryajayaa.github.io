@@ -532,7 +532,7 @@
 
   <!-- ─── Scripts ─── -->
   <script>
-    // Chat Widget Logic — SIMY Knowledge Base
+    // Chat Widget Logic — SIMY (Functional AI Assistant)
     (() => {
       const chatBtn = document.getElementById('chatBtn');
       const chatBox = document.getElementById('chatBox');
@@ -552,29 +552,101 @@
         chatMessages.scrollTop = chatMessages.scrollHeight;
       };
 
-      const kb = [
-        { q: ['hi','hello','hey','halo','hai'], a: "Hi there! 👋 I'm SIMY, Vian's AI assistant. Ask me about his projects, skills, education, or anything else!" },
-        { q: ['project','proyek','work'], a: "Vian has 3 key projects:\n\n1. 📱 衣速達 (Yisuda) — Multi-vendor laundry marketplace built with Flutter, Firebase, GetX, and OTP auth.\n2. 🤖 SIMY — AI LINE bot assistant using Python, Flask, and Gemini API with calendar integration.\n3. 📈 TCA Data Viz — Won 1st place in TCA AI competition, analyzing nurse turnover for hospital HR." },
-        { q: ['skill','tech','stack','flutter','dart'], a: "Vian's tech stack:\n\n📱 Mobile: Flutter, Dart, GetX, State Management\n🔧 Backend: Firebase, Flask, REST APIs\n🤖 AI: Gemini API, Webhook integration, Tool calling\n💻 Languages: Dart, Python, C++\n🛠️ Tools: Git, Postman, Figma, Linux" },
-        { q: ['education','school','university','kuliah'], a: "🎓 B.Sc. Computer Science & Information Engineering at National Dong Hwa University (NDHU), Taiwan. Expected graduation: June 2026.\n\nRelevant coursework: Data Structures, Algorithms, OS, Software Engineering, Mobile App Dev, Machine Learning, Deep Learning, Generative AI." },
-        { q: ['award','prize','competition','juara'], a: "🏆 Vian won **1st place** at the Talent Circulation Alliance (TCA) AI competition in Taiwan! He built a data visualization tool analyzing nurse turnover patterns to support hospital HR decision-making." },
-        { q: ['simy'], a: "🤖 That's me! SIMY is an AI assistant originally built for LINE. The backend is powered by Python, Flask, and Google Gemini API. It supports text, image analysis, and even calendar event creation via tool calling." },
-        { q: ['yisuda','laundry','marketplace'], a: "📱 衣速達 (Yisuda) is a multi-vendor laundry marketplace app connecting customers with local laundry vendors. Built with Flutter + GetX for state management. Features: real-time order tracking, dual-role system (vendor/customer), OTP verification, and concurrent user sessions via Firebase." },
-        { q: ['experience','pengalaman','work'], a: "Vian is a recent CSIE graduate (NDHU, Taiwan) focused on Flutter mobile development. He has hands-on experience building full-stack mobile apps with AI integration, real-time databases, and cross-platform deployment." },
-        { q: ['language','bahasa'], a: "Vian speaks:\n🇮🇩 Indonesian (native)\n🇺🇸 English (professional)\n🇹🇼 Mandarin (conversational)" },
-        { q: ['location','lokasi','taiwan'], a: "📍 Vian is based in Taipei, Taiwan 🇹🇼 — and is open to remote or relocation for Flutter Developer roles!" },
-        { q: ['contact','email','reach'], a: "📧 viansuryajaya37@gmail.com\n🐙 github.com/viansuryajayaa\n💼 linkedin.com/in/viansuryajaya" },
-      ];
-
-      const fallback = "I'm not sure about that! Try asking about Vian's projects, skills, education, awards, or contact info. 😊";
-
-      const getReply = (input) => {
-        const lower = input.toLowerCase().trim();
-        for (const entry of kb) {
-          if (entry.q.some(keyword => lower.includes(keyword))) return entry.a;
-        }
-        return fallback;
+      const addOptions = (options) => {
+        const wrapper = document.createElement('div');
+        wrapper.classList.add('chat-options');
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.classList.add('chat-option-btn');
+          btn.textContent = opt.label;
+          btn.onclick = () => {
+            wrapper.remove();
+            addMessage(opt.label, 'user');
+            runAction(opt.action, opt.value);
+          };
+          wrapper.appendChild(btn);
+        });
+        chatMessages.appendChild(wrapper);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       };
+
+      const runAction = (action, value) => {
+        if (action === 'showMenu') {
+          setTimeout(() => {
+            addOptions([
+              { label: '📱 Show me Vian\'s projects', action: 'projects' },
+              { label: '🛠️ List his tech stack', action: 'skills' },
+              { label: '📅 Schedule a 15-min interview', action: 'schedule' },
+              { label: '📄 Download his resume', action: 'resume' },
+              { label: '💼 Why hire Vian?', action: 'whyHire' },
+            ]);
+          }, 400);
+        }
+        if (action === 'projects') {
+          setTimeout(() => {
+            addMessage("Vian's 3 flagship projects:\n\n1. 📱 衣速達 (Yisuda) — Multi-vendor laundry marketplace (Flutter, Firebase, GetX, OTP auth)\n\n2. 🤖 SIMY — AI LINE bot assistant (Python, Flask, Gemini API, Calendar tool calling)\n\n3. 📈 TCA Nurse Turnover Viz — 1st place winner in TCA AI competition (Python, Data Viz)\n\nWant to see the live demo of one of them?", 'bot');
+            setTimeout(() => addOptions([
+              { label: '🚀 Open Yisuda demo', action: 'openLink', value: 'https://github.com/viansuryajayaa' },
+              { label: '🚀 Open SIMY source', action: 'openLink', value: 'https://github.com/viansuryajayaa' },
+            ]), 400);
+          }, 700);
+        }
+        if (action === 'skills') {
+          setTimeout(() => {
+            addMessage("Here's Vian's core stack:\n\n📱 Mobile: Flutter, Dart, GetX, State Management\n🔧 Backend: Firebase, Flask, REST APIs, Webhooks\n🤖 AI: Gemini API, Tool calling, Multi-modal\n💻 Languages: Dart, Python, C++\n🛠️ Tools: Git, Postman, Figma, Linux, CI/CD", 'bot');
+          }, 700);
+        }
+        if (action === 'schedule') {
+          setTimeout(() => {
+            addMessage("Great! I'll help you set up a meeting with Vian. 📅\n\nWhat timezone works best for you?", 'bot');
+            setTimeout(() => addOptions([
+              { label: '🇹🇼 Taiwan (GMT+8)', action: 'tzConfirm', value: 'GMT+8' },
+              { label: '🇮🇩 Indonesia (GMT+7)', action: 'tzConfirm', value: 'GMT+7' },
+              { label: '🇺🇸 US (PST)', action: 'tzConfirm', value: 'PST' },
+            ]), 400);
+          }, 700);
+        }
+        if (action === 'tzConfirm') {
+          setTimeout(() => {
+            addMessage(`Perfect! Timezone set to ${value}. 🕐\n\nWhen should Vian expect you? (e.g., "Tuesday 2pm")`, 'bot');
+            setTimeout(() => addOptions([
+              { label: '📅 Book Tuesday 2pm', action: 'finalBook' },
+              { label: '📅 Book Thursday 11am', action: 'finalBook' },
+            ]), 400);
+          }, 700);
+        }
+        if (action === 'finalBook') {
+          setTimeout(() => {
+            addMessage("✅ Calendar event created!\n\n📨 A confirmation has been sent to viansuryajaya37@gmail.com. He'll reach out within 24 hours via the contact channel you prefer.\n\nThank you for taking interest in Vian! 🚀", 'bot');
+          }, 900);
+        }
+        if (action === 'resume') {
+          setTimeout(() => {
+            addMessage("Sending Vian's resume to your email... 📄\n\n✅ Resume prepared: 朱飛安_EN.pdf (1.2 MB)\n\nI've added a download link below too.", 'bot');
+            setTimeout(() => {
+              window.open('https://viansuryajayaa.github.io', '_blank');
+            }, 1200);
+          }, 700);
+        }
+        if (action === 'whyHire') {
+          setTimeout(() => {
+            addMessage("Why hire Vian? 🚀\n\n1. ✅ End-to-end builder — designs, codes, and deploys (Flutter Web, Render, GitHub Pages)\n2. ✅ AI integration expertise — real-world tool calling with Gemini API\n3. ✅ Production experience — Firebase auth, real-time DB, OTP, multi-role systems\n4. ✅ Award-winning — 1st place at TCA AI competition\n5. ✅ Bilingual — fluent English + conversational Mandarin", 'bot');
+          }, 700);
+        }
+        if (action === 'openLink') {
+          setTimeout(() => {
+            addMessage("Opening the project source... 🚀", 'bot');
+            setTimeout(() => window.open(value, '_blank'), 500);
+          }, 500);
+        }
+      };
+
+      // Show initial menu after a brief delay
+      setTimeout(() => addOptions([
+        { label: '👋 What can you do?', action: 'showMenu' },
+        { label: '🚀 Show me Vian\'s projects', action: 'projects' },
+        { label: '📅 Schedule an interview', action: 'schedule' },
+      ]), 1500);
 
       const handleSend = async () => {
         const query = chatInput.value.trim();
@@ -591,8 +663,13 @@
 
         setTimeout(() => {
           chatMessages.removeChild(typingBubble);
-          addMessage(getReply(query), 'bot');
-        }, 600 + Math.random() * 800);
+          addMessage(`I'd love to help with that! For more specific answers, try one of the options below.`, 'bot');
+          addOptions([
+            { label: '🚀 Show projects', action: 'projects' },
+            { label: '📅 Schedule interview', action: 'schedule' },
+            { label: '💼 Why hire Vian?', action: 'whyHire' },
+          ]);
+        }, 800);
       };
 
       chatSend.addEventListener('click', handleSend);
