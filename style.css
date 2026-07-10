@@ -1,4 +1,4 @@
-/* ─── Apple Minimalist Design System (NeedMCP) ─── */
+/* ─── Apple Minimalist Design System (Developer Edition) ─── */
 
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
@@ -18,7 +18,6 @@
   --radius-pill: 980px;
 }
 
-/* ─── Reset ─── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -26,9 +25,7 @@
   -webkit-font-smoothing: antialiased;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--bg);
@@ -39,29 +36,6 @@ body {
   letter-spacing: -0.022em;
   overflow-x: hidden;
 }
-
-a {
-  color: var(--accent);
-  text-decoration: none;
-  transition: opacity 0.2s;
-}
-a:hover {
-  opacity: 0.8;
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-ul {
-  list-style: none;
-}
-
-/* ─── Scrollbar ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--surface-elevated); border-radius: 3px; }
 
 /* ─── Background Glow ─── */
 #bg-glow {
@@ -79,67 +53,18 @@ ul {
   position: absolute;
   border-radius: 50%;
   filter: blur(120px);
-  opacity: 0.08;
+  opacity: 0.1;
   animation: drift 25s infinite alternate ease-in-out;
 }
 
-.blob-1 {
-  top: -20%;
-  right: -10%;
-  width: 600px;
-  height: 600px;
-  background: var(--accent);
-}
-
-.blob-2 {
-  bottom: -15%;
-  left: -10%;
-  width: 500px;
-  height: 500px;
-  background: #a259ff;
-  animation-delay: -8s;
-}
-
-.blob-3 {
-  top: 40%;
-  left: 30%;
-  width: 400px;
-  height: 400px;
-  background: #30d158;
-  animation-delay: -16s;
-}
+.blob-1 { top: -10%; right: -10%; width: 600px; height: 600px; background: var(--accent); }
+.blob-2 { bottom: -10%; left: -10%; width: 500px; height: 500px; background: #a259ff; animation-delay: -8s; }
+.blob-3 { top: 30%; left: 30%; width: 400px; height: 400px; background: #30d158; animation-delay: -16s; }
 
 @keyframes drift {
   0%   { transform: translate(0, 0) scale(1); }
   50%  { transform: translate(40px, -40px) scale(1.1); }
   100% { transform: translate(-20px, 30px) scale(0.95); }
-}
-
-/* ─── Custom Cursor ─── */
-.custom-cursor {
-  width: 8px;
-  height: 8px;
-  background: var(--accent);
-  border-radius: 50%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: transform 0.1s;
-}
-
-.custom-cursor-follower {
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(var(--accent-rgb), 0.5);
-  border-radius: 50%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  transition: transform 0.15s ease-out, width 0.2s, height 0.2s;
 }
 
 /* ─── Navigation ─── */
@@ -177,21 +102,20 @@ nav .logo {
 nav ul {
   display: flex;
   gap: 28px;
+  list-style: none;
 }
 
 nav a {
   color: var(--text-dim);
   font-size: 13px;
   font-weight: 500;
+  text-decoration: none;
   transition: color 0.2s;
 }
 
-nav a:hover {
-  color: var(--text);
-  opacity: 1;
-}
+nav a:hover { color: var(--text); }
 
-/* ─── Hero Section ─── */
+/* ─── Hero Section (No Photo) ─── */
 .hero {
   min-height: 100vh;
   display: flex;
@@ -200,9 +124,6 @@ nav a:hover {
   align-items: center;
   text-align: center;
   padding: 120px 32px 80px;
-  background:
-    linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.9)),
-    url("assets/hero-bg.jpg") center / cover no-repeat;
   position: relative;
 }
 
@@ -227,10 +148,6 @@ nav a:hover {
   margin-bottom: 20px;
 }
 
-.hero h1 span {
-  display: block;
-}
-
 .hero p {
   font-size: 20px;
   color: var(--text-dim);
@@ -251,9 +168,7 @@ nav a:hover {
   transition: opacity 0.2s;
 }
 
-.hero-cta:hover {
-  opacity: 0.85;
-}
+.hero-cta:hover { opacity: 0.85; }
 
 /* ─── Sections ─── */
 section {
@@ -279,51 +194,46 @@ section {
   line-height: 1.1;
   margin-bottom: 48px;
   color: var(--text);
+  text-align: center;
 }
 
-/* ─── About ─── */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: start;
-}
-
-.about-photo img {
-  width: 100%;
-  border-radius: var(--radius-lg);
-  object-fit: cover;
+/* ─── About (No Photo) ─── */
+.about-content {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
 }
 
 .about-text p {
-  font-size: 17px;
+  font-size: 18px;
   color: var(--text-dim);
-  line-height: 1.7;
-  margin-bottom: 32px;
+  line-height: 1.8;
+  margin-bottom: 48px;
 }
 
 .about-stats {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+  justify-content: center;
 }
 
 .stat-card {
   background: var(--surface);
-  padding: 28px 24px;
+  padding: 32px 24px;
   border-radius: var(--radius);
   text-align: center;
 }
 
 .stat-card h3 {
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 700;
   color: var(--accent);
   margin-bottom: 4px;
 }
 
 .stat-card p {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--text-dim);
 }
 
@@ -331,7 +241,7 @@ section {
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 24px;
 }
 
 .skill-card {
@@ -515,9 +425,7 @@ footer {
   transition: transform 0.2s;
 }
 
-.chat-btn:hover {
-  transform: scale(1.08);
-}
+.chat-btn:hover { transform: scale(1.08); }
 
 .chat-box {
   position: absolute;
@@ -630,9 +538,7 @@ footer {
   outline: none;
 }
 
-.chat-input:focus {
-  border-color: var(--accent);
-}
+.chat-input:focus { border-color: var(--accent); }
 
 .chat-send {
   background: var(--accent);
@@ -647,9 +553,7 @@ footer {
   transition: opacity 0.2s;
 }
 
-.chat-send:hover {
-  opacity: 0.85;
-}
+.chat-send:hover { opacity: 0.85; }
 
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
@@ -662,8 +566,7 @@ footer {
   .hero { padding: 100px 20px 60px; }
   .hero p { font-size: 17px; }
 
-  .about-grid { grid-template-columns: 1fr; gap: 32px; }
-  .about-stats { grid-template-columns: 1fr 1fr; }
+  .about-stats { grid-template-columns: 1fr; }
 
   .skills-grid { grid-template-columns: 1fr; }
 
@@ -675,7 +578,6 @@ footer {
   }
 }
 
-/* ─── Animate on load ─── */
 .animate-hero {
   opacity: 0;
   transform: translateY(24px);
