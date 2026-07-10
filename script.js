@@ -115,7 +115,7 @@ setTimeout(() => {
           { label: '📱 Show me Vian\'s projects', action: 'projects' },
           { label: '🛠️ List his tech stack', action: 'skills' },
           { label: '📅 Schedule a 15-min interview', action: 'schedule' },
-          { label: '📄 Download his resume', action: 'resume' },
+          { label: '📄 Download his resume', action: 'openLink', value: 'https://viansuryajayaa.github.io/resume.pdf' },
           { label: '💼 Why hire Vian?', action: 'whyHire' },
         ]);
       }, 400);
@@ -158,14 +158,6 @@ setTimeout(() => {
         addMessage("✅ Calendar event created!\n\n📨 A confirmation has been sent to viansuryajaya37@gmail.com. He'll reach out within 24 hours via the contact channel you prefer.\n\nThank you for taking interest in Vian! 🚀", 'bot');
       }, 900);
     }
-    if (action === 'resume') {
-      setTimeout(() => {
-        addMessage("Sending Vian's resume to your email... 📄\n\n✅ Resume prepared: 朱飛安_EN.pdf (1.2 MB)\n\nI've added a download link below too.", 'bot');
-        setTimeout(() => {
-          window.open('https://viansuryajayaa.github.io', '_blank');
-        }, 1200);
-      }, 700);
-    }
     if (action === 'whyHire') {
       setTimeout(() => {
         addMessage("Why hire Vian? 🚀\n\n1. ✅ End-to-end builder — designs, codes, and deploys (Flutter Web, Render, GitHub Pages)\n2. ✅ AI integration expertise — real-world tool calling with Gemini API\n3. ✅ Production experience — Firebase auth, real-time DB, OTP, multi-role systems\n4. ✅ Award-winning — 1st place at TCA AI competition\n5. ✅ Bilingual — fluent English + conversational Mandarin", 'bot');
@@ -183,6 +175,7 @@ setTimeout(() => {
   setTimeout(() => addOptions([
     { label: '👋 What can you do?', action: 'showMenu' },
     { label: '🚀 Show me Vian\'s projects', action: 'projects' },
+    { label: '📄 Download CV', action: 'openLink', value: 'https://viansuryajayaa.github.io/resume.pdf' },
     { label: '📅 Schedule an interview', action: 'schedule' },
   ]), 1500);
 
@@ -275,7 +268,17 @@ setTimeout(() => {
       };
     }
 
-    // Default response
+    // Resume / PDF
+    if (/\b(resume|cv|pdf|download|unduh|curriculum|vitae)\b/.test(clean)) {
+      return {
+        text: "Sure! You can download Vian's latest CV in PDF format here.",
+        options: [
+          { label: '📄 Download CV (PDF)', action: 'openLink', value: 'https://viansuryajayaa.github.io/resume.pdf' }
+        ]
+      };
+    }
+
+    // Default response (sudah ada sebelumnya)
     return {
       text: `I understood: "${input}". To give you the best answer regarding Vian's portfolio, you can ask about his projects, skills, education, or choose from these options:`,
       options: [
