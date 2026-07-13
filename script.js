@@ -106,3 +106,24 @@ function getLocalReply(input) {
   }
   return null;
 }
+
+
+// ─── Runify Interactive Mockup ───
+const hotspotBtn = document.getElementById("hotspotGo");
+const overlay = document.getElementById("runifyOverlay");
+const backBtn = document.getElementById("backBtn");
+const phoneScreen = document.getElementById("runifyScreen");
+
+if (hotspotBtn && overlay && backBtn && phoneScreen) {
+  hotspotBtn.addEventListener("click", () => {
+    phoneScreen.classList.add("pressed");
+    setTimeout(() => {
+      phoneScreen.classList.remove("pressed");
+      overlay.classList.add("active");
+    }, 200);
+  });
+
+  backBtn.addEventListener("click", () => {
+    overlay.classList.remove("active");
+  });
+}

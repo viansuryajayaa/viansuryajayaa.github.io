@@ -620,3 +620,171 @@ footer {
 .interactive-project .body {
   width: 100%;
 }
+
+/* ─── Interactive Phone Mockup ─── */
+.phone-mockup {
+  position: relative;
+  width: 320px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.phone-frame {
+  position: relative;
+  width: 320px;
+  height: 680px;
+  background: #1a1a1e;
+  border-radius: 48px;
+  padding: 12px;
+  box-shadow:
+    0 0 0 2px #333,
+    0 0 0 4px #000,
+    0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.phone-notch {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 130px;
+  height: 28px;
+  background: #000;
+  border-radius: 0 0 18px 18px;
+  z-index: 10;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 36px;
+  overflow: hidden;
+  position: relative;
+  background: #0a0e27;
+}
+
+.phone-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Interactive hotspots */
+.hotspot {
+  position: absolute;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 5;
+}
+
+.hotspot:hover {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+}
+
+.hotspot:active {
+  transform: scale(0.95);
+}
+
+.hotspot-btn {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 56px;
+  border-radius: 28px;
+}
+
+/* Pressed state */
+.phone-screen.pressed .hotspot-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Modal overlay for screen transition */
+.screen-overlay {
+  position: absolute;
+  inset: 0;
+  background: #0f1428;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+  padding: 32px;
+  text-align: center;
+}
+
+.screen-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.screen-overlay h3 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12px;
+}
+
+.screen-overlay p {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-bottom: 32px;
+  line-height: 1.5;
+}
+
+.screen-overlay .overlay-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.screen-overlay .stat-item {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.screen-overlay .stat-item .num {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.screen-overlay .stat-item .label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 4px;
+}
+
+.screen-overlay .back-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 12px 32px;
+  border-radius: 24px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.screen-overlay .back-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Project card adjustment for emulator */
+.interactive-project {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.interactive-project .body {
+  width: 100%;
+}
