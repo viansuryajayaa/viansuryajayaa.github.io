@@ -666,7 +666,7 @@ footer {
 .phone-screen img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
@@ -793,6 +793,6 @@ footer {
 .phone-screen video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
