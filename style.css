@@ -642,17 +642,7 @@ footer {
     0 20px 60px rgba(0, 0, 0, 0.5);
 }
 
-.phone-notch {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 130px;
-  height: 28px;
-  background: #000;
-  border-radius: 0 0 18px 18px;
-  z-index: 10;
-}
+
 
 .phone-screen {
   width: 100%;
@@ -795,4 +785,29 @@ footer {
   height: 100%;
   object-fit: contain;
   display: block;
+}
+
+
+/* ─── Dynamic Island (iPhone 16 Pro) ─── */
+.phone-dynamic-island {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 36px;
+  background: #000;
+  border-radius: 20px;
+  z-index: 10;
+  box-shadow: 0 0 0 3px #0a0a0c;
+}
+
+/* Increase phone frame top padding for screen content */
+.phone-frame {
+  padding-top: 18px;
+}
+
+/* Ensure phone notch does not conflict */
+.phone-notch {
+  display: none;
 }
