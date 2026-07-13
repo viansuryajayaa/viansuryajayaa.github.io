@@ -629,18 +629,7 @@ footer {
   user-select: none;
 }
 
-.phone-frame {
-  position: relative;
-  width: 320px;
-  height: 680px;
-  background: #1a1a1e;
-  border-radius: 48px;
-  padding: 12px;
-  box-shadow:
-    0 0 0 2px #333,
-    0 0 0 4px #000,
-    0 20px 60px rgba(0, 0, 0, 0.5);
-}
+
 
 
 
@@ -789,25 +778,62 @@ footer {
 
 
 /* ─── Dynamic Island (iPhone 16 Pro) ─── */
-.phone-dynamic-island {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px;
-  height: 36px;
-  background: #000;
-  border-radius: 20px;
-  z-index: 10;
-  box-shadow: 0 0 0 3px #0a0a0c;
-}
+
 
 /* Increase phone frame top padding for screen content */
-.phone-frame {
-  padding-top: 18px;
-}
+
 
 /* Ensure phone notch does not conflict */
 .phone-notch {
   display: none;
+}
+
+
+/* ─── iPhone 16 Pro Mockup (Ultra-Thin Bezel) ─── */
+.phone-frame {
+  position: relative;
+  width: 312px;
+  height: 676px;
+  background: #030303;
+  border-radius: 46px;
+  padding: 6px; /* Ultra-thin bezel simulation */
+  box-shadow:
+    0 0 0 1px #222, /* Inner Titanium border */
+    0 0 0 4px #09090b, /* Outer screen border */
+    0 24px 70px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  overflow: hidden;
+}
+
+/* Dynamic Island */
+.phone-dynamic-island {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px; /* Slimmer dynamic island */
+  height: 28px;
+  background: #000;
+  border-radius: 14px;
+  z-index: 10;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05); /* Soft highlight edge */
+}
+
+/* Ensure the screen behaves like a real display */
+.phone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 40px;
+  overflow: hidden;
+  background: #000;
+}
+
+.phone-screen video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Cover is better to look like a borderless screen, but we will make it contain if aspects differ. Since video is 1170x2542 (almost identical to 19.5:9), cover is actually perfect! */
+  display: block;
 }
