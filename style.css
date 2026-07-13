@@ -624,9 +624,11 @@ footer {
 /* ─── Interactive Phone Mockup ─── */
 .phone-mockup {
   position: relative;
-  width: 320px;
+  width: 312px;
   margin: 0 auto;
   user-select: none;
+  padding-top: 40px; /* Space between container and top of phone */
+  padding-bottom: 20px;
 }
 
 
@@ -808,18 +810,7 @@ footer {
 }
 
 /* Dynamic Island */
-.phone-dynamic-island {
-  position: absolute;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90px; /* Slimmer dynamic island */
-  height: 28px;
-  background: #000;
-  border-radius: 14px;
-  z-index: 10;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05); /* Soft highlight edge */
-}
+
 
 /* Ensure the screen behaves like a real display */
 .phone-screen {
