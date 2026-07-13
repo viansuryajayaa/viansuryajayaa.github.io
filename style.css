@@ -624,11 +624,9 @@ footer {
 /* ─── Interactive Phone Mockup ─── */
 .phone-mockup {
   position: relative;
-  width: 312px;
-  margin: 0 auto;
+  width: 320px;
+  margin: 40px auto 20px auto; /* 40px top margin creates the space */
   user-select: none;
-  padding-top: 40px; /* Space between container and top of phone */
-  padding-bottom: 20px;
 }
 
 
@@ -636,12 +634,15 @@ footer {
 
 
 .phone-screen {
+  position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 36px;
+  border-radius: 40px;
   overflow: hidden;
-  position: relative;
-  background: #0a0e27;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .phone-screen img {
@@ -794,18 +795,14 @@ footer {
 /* ─── iPhone 16 Pro Mockup (Ultra-Thin Bezel) ─── */
 .phone-frame {
   position: relative;
-  width: 312px;
-  height: 676px;
+  width: 320px;
+  height: 690px;
   background: #030303;
   border-radius: 46px;
-  padding: 6px; /* Ultra-thin bezel simulation */
-  box-shadow:
-    0 0 0 1px #222, /* Inner Titanium border */
-    0 0 0 4px #09090b, /* Outer screen border */
-    0 24px 70px rgba(0, 0, 0, 0.7);
+  padding: 6px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
-  justify-content: stretch;
   overflow: hidden;
 }
 
